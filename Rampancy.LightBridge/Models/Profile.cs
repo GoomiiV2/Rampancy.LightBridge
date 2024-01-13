@@ -55,6 +55,7 @@ namespace Rampancy.LightBridge
                 Name       = Name,
                 Game       = Game,
                 Editor     = Editor,
+                Compiler   = Compiler,
                 HEKPath    = HEKPath,
                 OutputPath = OutputPath,
                 ShaderTags = ShaderTags

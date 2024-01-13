@@ -21,6 +21,13 @@ namespace Rampancy.Ligthbridge
 
             Processor.OnSyncingStarted = SyncingStarted;
             Processor.OnSyncingDone = SyncingStoped;
+
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+        }
+
+        private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            Log.Error("Global Exception: {Exception}", e);
         }
 
         private void MainForm_Load(object sender, EventArgs e)
@@ -44,6 +51,7 @@ namespace Rampancy.Ligthbridge
         {
             CurrentProfile = EditingProfile.Copy();
             CurrentProfile.Save(Data.ProfilesDir);
+            Processor.SetProfile(CurrentProfile);
         }
 
         private void BTN_Cancel_Click(object sender, EventArgs e)
@@ -72,7 +80,10 @@ namespace Rampancy.Ligthbridge
         private void SetupLogging()
         {
             var latestLogPath = Path.Combine(Data.LogsDir, "latest.txt");
-            File.Delete(latestLogPath);
+
+            if (File.Exists(latestLogPath))
+                File.Delete(latestLogPath);
+
             Log.Logger = new LoggerConfiguration()
                 .WriteTo.File(Path.Combine(Data.LogsDir, "log.txt"), rollingInterval: RollingInterval.Day, outputTemplate: "{Timestamp:HH:mm:ss} [{Category}] [{Level:u3}] {Message:lj}{NewLine}{Exception}")
                 .WriteTo.File(latestLogPath)
