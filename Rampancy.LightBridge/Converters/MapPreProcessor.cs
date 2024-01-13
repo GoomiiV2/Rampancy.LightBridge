@@ -78,8 +78,6 @@ namespace Rampancy.LightBridge
                         Log.Information("{surContentsFaceValue}", surContentsFaceValue.ToArray());
                     }
                     */
-
-                    Log.Information($" {texName} ", texName);
                 }
                 else if(trimmedLine.StartsWith("\"classname\""))
                 {
