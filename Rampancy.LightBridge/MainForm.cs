@@ -33,7 +33,7 @@ namespace Rampancy.Ligthbridge
         private void MainForm_Load(object sender, EventArgs e)
         {
             SetupLogging();
-            Log.Information("{Name} {Version}", Data.DirName, "v0.1");
+            Log.Information("{Name} v{Version}", Data.DirName, ThisAssembly.AssemblyInformationalVersion);
             LoadProfiles();
         }
 

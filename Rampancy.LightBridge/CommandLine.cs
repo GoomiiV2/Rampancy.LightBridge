@@ -18,7 +18,7 @@ namespace Rampancy.LightBridge
         public static void Run(string[] args)
         {
             SetupLogging();
-            Log.Information("{Name} Commandline {Version}", Data.DirName, "v0.1");
+            Log.Information("{Name} Commandline v{Version}", Data.DirName, ThisAssembly.AssemblyInformationalVersion);
             Log.Information("Args: {Args}", args);
 
             var rootCmd = new RootCommand(Data.DirName);
