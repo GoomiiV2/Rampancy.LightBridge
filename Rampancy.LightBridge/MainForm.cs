@@ -98,6 +98,9 @@ namespace Rampancy.Ligthbridge
         {
             var name = CB_Profiles.Items[idx].ToString();
             CurrentProfile = Profiles.FirstOrDefault(x => x.Name == name);
+            if (!CheckIfProfileIsValid(CurrentProfile))
+                return;
+
             Processor.SetProfile(CurrentProfile);
 
             GB_Main.Text = $"Profile: {name}";
@@ -116,15 +119,15 @@ namespace Rampancy.Ligthbridge
 
             string msgStr = "";
             if (state.HasFlag(ProfileValidState.NoName))
-                msgStr += "Profile doesn't have a name set.\n";
+                msgStr += $"Profile ({profile.Name}) doesn't have a name set.\n";
 
             if (state.HasFlag(ProfileValidState.NoHEKPath))
-                msgStr += "Profile doesn't have the HEK path set.\n";
+                msgStr += $"Profile ({profile.Name}) doesn't have the HEK path set.\n";
 
             if (state.HasFlag(ProfileValidState.NoOutputPath))
-                msgStr += "Profile doesn't have the output path set.\n";
+                msgStr += $"Profile ({profile.Name}) doesn't have the output path set.\n";
 
-            MessageBox.Show(msgStr, "Profile wasn't valid.");
+            MessageBox.Show(msgStr, $"Profile ({profile.Name}) wasn't valid.");
             Log.Warning(msgStr);
 
             return false;

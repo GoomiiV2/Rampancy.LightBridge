@@ -1,7 +1,9 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.IO.Compression;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 
 namespace RampantC20
 {
@@ -86,13 +88,102 @@ namespace RampantC20
             return (ushort) ((ushort) ((x & 0xff) << 8) | ((x >> 8) & 0xff));
         }
 
-        /*public static float CalcAreaOfTri(Vector3 p1, Vector3 p2, Vector3 p3)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float CalcAreaOfTri(Vector3 v1, Vector3 v2, Vector3 v3)
         {
-            double a = (p1 - p2).magnitude;
-            double b = (p2 - p3).magnitude;
-            double c = (p3 - p1).magnitude;
-            double s = (a  + b + c) / 2;
-            return Mathf.Sqrt((float)(s * (s -a) * (s -b) * (s -c)));
-        }*/
+            var l1 = Vector3.Distance(v1, v2);
+            var l2 = Vector3.Distance(v1, v3);
+            var l3 = Vector3.Distance(v2, v3);
+
+            var semiPerm = (l1 + l2 + l3) / 2;
+            var areaToBeSqrRooted = semiPerm * (semiPerm - l1) * (semiPerm - l2) * (semiPerm - l3);
+            var area = (float)Math.Sqrt(areaToBeSqrRooted);
+
+            return area;
+        }
+
+        // https://i.imgflip.com/7fgjfe.jpg
+        public static bool IsDegenerateTri(Vector3 v1, Vector3 v2, Vector3 v3)
+        {
+            const float TOLERANCE = 0.0001f;
+            var area = CalcAreaOfTri(v1, v2, v3);
+
+            if (area <= TOLERANCE ||
+                Math.Abs(Vector3.Distance(v1, v2)) <= TOLERANCE ||
+                Math.Abs(Vector3.Distance(v1, v3)) <= TOLERANCE ||
+                Math.Abs(Vector3.Distance(v2, v3)) <= TOLERANCE)
+                return true;
+
+            return false;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Vector3 GetTriNormal(Vector3 vi1, Vector3 vi2, Vector3 vi3)
+        {
+            var v0 = vi2 - vi1;
+            var v1 = vi3 - vi1;
+            var n  = Vector3.Cross(v0, v1);
+
+            return Vector3.Normalize(n);
+        }
+
+        public static Vector3 ProjectPointToLine(Vector3 point, Vector3 lineStart, Vector3 lineEnd)
+        {
+            Vector3 relativePoint = point - lineStart;
+            Vector3 lineDirection = lineEnd - lineStart;
+            float length = lineDirection.Length();
+            Vector3 normalizedLineDirection = lineDirection;
+            if (length > .000001f)
+            {
+                normalizedLineDirection /= length;
+            }
+
+            float dot = Vector3.Dot(normalizedLineDirection, relativePoint);
+            dot = Math.Clamp(dot, 0.0F, length);
+
+            return lineStart + normalizedLineDirection * dot;
+        }
+
+        public static float DistancePointToLine(Vector3 point, Vector3 lineStart, Vector3 lineEnd)
+        {
+            return (ProjectPointToLine(point, lineStart, lineEnd) - point).Length();
+        }
+
+        public static string Halo1MatFlagsToString(uint flags)
+        {
+            var str = "";
+
+            if ((flags & (1 << 10)) != 0)
+                str += "%";
+
+            if ((flags & (1 << 11)) != 0)
+                str += "#";
+
+            if ((flags & (1 << 12)) != 0)
+                str += "!";
+
+            if ((flags & (1 << 13)) != 0)
+                str += "*";
+
+            if ((flags & (1 << 14)) != 0)
+                str += "@";
+
+            if ((flags & (1 << 15)) != 0)
+                str += "$";
+
+            if ((flags & (1 << 16)) != 0)
+                str += "^";
+
+            if ((flags & (1 << 17)) != 0)
+                str += "-";
+
+            if ((flags & (1 << 18)) != 0)
+                str += "&";
+
+            if ((flags & (1 << 19)) != 0)
+                str += ".";
+
+            return str;
+        }
     }
 }

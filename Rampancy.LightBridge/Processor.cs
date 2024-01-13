@@ -1,4 +1,5 @@
-﻿using RampantC20;
+﻿using Rampancy.LightBridge.Properties;
+using RampantC20;
 using RampantC20.Halo1;
 using Serilog;
 using System;
@@ -6,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing.Imaging;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using static Rampancy.ImportedAssetDb;
@@ -59,6 +61,7 @@ namespace Rampancy.LightBridge
             var task = Task.Factory.StartNew(() =>
             {
                 WaitTillAllTasksAreFinished();
+                CopyToolTextures();
                 IsSyncing = false;
                 OnSyncingDone?.Invoke();
 
@@ -121,23 +124,34 @@ namespace Rampancy.LightBridge
         private void Halo1_ProcessShader(TagInfo tagInfo)
         {
             var importedAsset = new ImportedAsset(tagInfo.PathNoExt);
+            var diffusePath = "";
+            bool keepAlpha = false;
             if (tagInfo.TagType == "shader_environment")
             {
                 var shader = new ShaderEnvironmentTag();
                 shader.Read(tagInfo);
+                diffusePath = shader.BaseMap.Path;
+                keepAlpha = false; //((shader.ShaderFlags & 0x1) != 0); // Is alpha tested flag
+            }
+            else if (tagInfo.TagType == "shader_transparent_glass")
+            {
+                var shader = new ShaderTransparentGlassTag();
+                shader.Read(tagInfo);
+                diffusePath = shader.DiffuseMap.Path;
+                //keepAlpha   = ((shader.ShaderFlags & 0x1) != 0); // Is alpha tested flag
+            }
 
-                if (!string.IsNullOrEmpty(shader.BaseMap.Path))
+            if (!string.IsNullOrEmpty(diffusePath))
+            {
+                var baseMapTexTagInfo = AssetDb.FindTagByRelPath(diffusePath, "bitmap");
+                if (baseMapTexTagInfo != null)
                 {
-                    var baseMapTexTagInfo = AssetDb.FindTagByRelPath(shader.BaseMap.Path, "bitmap");
-                    if (baseMapTexTagInfo != null)
-                    {
-                        var shaderPath = Path.Combine(Profile.OutputPath, "textures", $"{tagInfo.PathNoExt}.png");
-                        TextureQueue.AddItem(new TextureImportData(baseMapTexTagInfo, shaderPath));
-                        importedAsset.AddRef(shader.BaseMap.Path, "bitmap");
-                    }
-
-                    //WriteQuake3Shader($"{shaderPath}.shader", tagInfo.PathNoExt, shader.BaseMap.Path);
+                    var shaderPath = Path.Combine(Profile.OutputPath, "textures", $"{tagInfo.PathNoExt}.png");
+                    TextureQueue.AddItem(new TextureImportData(baseMapTexTagInfo, shaderPath, keepAlpha));
+                    importedAsset.AddRef(diffusePath, "bitmap");
                 }
+
+                //WriteQuake3Shader($"{shaderPath}.shader", tagInfo.PathNoExt, shader.BaseMap.Path);
             }
 
             ImportedAssetDb.Add(importedAsset, tagInfo.TagType);
@@ -147,8 +161,9 @@ namespace Rampancy.LightBridge
         {
             ImportedAssetDb.Add(taskInfo.TextureTag.PathNoExt, taskInfo.TextureTag.TagType);
 
+            var noAlpha = !taskInfo.KeepAlpha;
             var texData = Utils.GetColorPlateFromBitMap(taskInfo.TextureTag).Value;
-            using (var bitmap = BitmapFromRGBAArray(texData.width, texData.height, texData.pixels))
+            using (var bitmap = BitmapFromRGBAArray(texData.width, texData.height, texData.pixels, noAlpha))
             {
                 Directory.CreateDirectory(Path.GetDirectoryName(taskInfo.DestPath));
                 try
@@ -164,7 +179,7 @@ namespace Rampancy.LightBridge
             }
         }
 
-        private unsafe Bitmap BitmapFromRGBAArray(int width, int height, byte[] values)
+        private unsafe Bitmap BitmapFromRGBAArray(int width, int height, byte[] values, bool noAlpha = false)
         {
             Bitmap bmp        = new Bitmap(width, height);
             BitmapData bmData = bmp.LockBits(new System.Drawing.Rectangle(0, 0, bmp.Width, bmp.Height), System.Drawing.Imaging.ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
@@ -185,8 +200,11 @@ namespace Rampancy.LightBridge
                     p[0] = values[idx++];// R component.
                     p[1] = values[idx++];// G component.
                     p[2] = values[idx++];// B component.
-                    p[3] = values[idx++];// Alpha component.
+                    p[3] = noAlpha ? (byte)255 : values[idx++];// Alpha component.
                     p += 4;
+
+                    if (noAlpha)
+                        idx++;
                 }
             }
 
@@ -203,6 +221,46 @@ namespace Rampancy.LightBridge
 
             Directory.CreateDirectory(Path.GetDirectoryName(path));
             File.WriteAllText(path, shaderTemplate);
+        }
+
+        // Copy some tool textures used in the editors only that might not be with the gmaes
+        private void CopyToolTextures()
+        {
+            if (Profile.Game is Game.HaloCE or Game.HaloCEMCC)
+            {
+                CopyHalo1ToolTextures();
+            }
+        }
+
+        private void CopyHalo1ToolTextures()
+        {
+            var basePath     = Path.Combine(Profile.OutputPath, "textures", "tooltex");
+            var skyEmbedPath = "Rampancy.LightBridge.Assets.tooltex.Sky.png";
+            SaveEmbedResourceToDisk(skyEmbedPath, Path.Combine(basePath, "+sky.png"));
+            SaveEmbedResourceToDisk(skyEmbedPath, Path.Combine(basePath, "+sky0.png"));
+            SaveEmbedResourceToDisk(skyEmbedPath, Path.Combine(basePath, "+sky1.png"));
+            SaveEmbedResourceToDisk(skyEmbedPath, Path.Combine(basePath, "+sky2.png"));
+            SaveEmbedResourceToDisk(skyEmbedPath, Path.Combine(basePath, "+sky3.png"));
+
+            SaveEmbedResourceToDisk("Rampancy.LightBridge.Assets.tooltex.Portal.png", Path.Combine(basePath, "+portal.png"));
+            SaveEmbedResourceToDisk("Rampancy.LightBridge.Assets.tooltex.Exact Portal.png", Path.Combine(basePath, "+exactportal.png"));
+            SaveEmbedResourceToDisk("Rampancy.LightBridge.Assets.tooltex.Weather Poly.png", Path.Combine(basePath, "+weatherpoly.png"));
+            SaveEmbedResourceToDisk("Rampancy.LightBridge.Assets.tooltex.Sound.png", Path.Combine(basePath, "+sound.png"));
+
+            SaveEmbedResourceToDisk("Rampancy.LightBridge.Assets.tooltex.Skip.png", Path.Combine(basePath, "skip.png"));
+            SaveEmbedResourceToDisk("Rampancy.LightBridge.Assets.tooltex.Skip.png", Path.Combine(basePath, "hintskip.png"));
+        }
+
+        private void SaveEmbedResourceToDisk(string embedPath, string diskPath)
+        {
+            using (var resource = Assembly.GetExecutingAssembly().GetManifestResourceStream(embedPath))
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(diskPath));
+                using (var file = new FileStream(diskPath, FileMode.Create, FileAccess.Write))
+                {
+                    resource.CopyTo(file);
+                }
+            }
         }
     }
 }

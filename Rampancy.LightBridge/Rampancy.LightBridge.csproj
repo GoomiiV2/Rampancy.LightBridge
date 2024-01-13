@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net7.0-windows</TargetFramework>
+    <TargetFramework>net8.0-windows7.0</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -11,6 +11,24 @@
 
   <ItemGroup>
     <None Remove="Assets\LightBridge_BG.png" />
+    <None Remove="Assets\tooltex\Exact Portal.png" />
+    <None Remove="Assets\tooltex\Portal.png" />
+    <None Remove="Assets\tooltex\Skip.png" />
+    <None Remove="Assets\tooltex\Sky.png" />
+    <None Remove="Assets\tooltex\Sound.png" />
+    <None Remove="Assets\tooltex\Weather Poly.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\tooltex\Skip.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\tooltex\Exact Portal.png" />
+    <EmbeddedResource Include="Assets\tooltex\Portal.png" />
+    <EmbeddedResource Include="Assets\tooltex\Sky.png" />
+    <EmbeddedResource Include="Assets\tooltex\Sound.png" />
+    <EmbeddedResource Include="Assets\tooltex\Weather Poly.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -19,8 +37,10 @@
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="Serilog" Version="3.0.1" />
-    <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+    <PackageReference Include="Serilog" Version="3.1.2-dev-02097" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="5.0.1" />
+    <PackageReference Include="Serilog.Sinks.File" Version="5.0.1-dev-00968" />
+    <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
   </ItemGroup>
 
   <ItemGroup>

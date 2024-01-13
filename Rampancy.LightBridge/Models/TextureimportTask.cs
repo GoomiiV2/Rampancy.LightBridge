@@ -11,11 +11,13 @@ namespace Rampancy.LightBridge
     {
         public TagInfo TextureTag;
         public string DestPath;
+        public bool KeepAlpha;
 
-        public TextureImportData(TagInfo textureTag, string destPath)
+        public TextureImportData(TagInfo textureTag, string destPath, bool keepAlpha)
         {
-            TextureTag = textureTag;
-            DestPath   = destPath;
+            TextureTag     = textureTag;
+            DestPath       = destPath;
+            KeepAlpha      = keepAlpha;
         }
     }
 }

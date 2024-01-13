@@ -20,6 +20,8 @@ namespace Rampancy.LightBridge
         public Game Game;
         [JsonConverter(typeof(StringEnumConverter))]
         public OutPutEditor Editor;
+        [JsonConverter(typeof(StringEnumConverter))]
+        public Compiler Compiler;
         public string HEKPath;
         public string OutputPath;
         public string[] ShaderTags;
@@ -28,6 +30,7 @@ namespace Rampancy.LightBridge
         [JsonIgnore] public string TagsDir         => Path.Combine(HEKPath, "tags");
         [JsonIgnore] public string AssetDB         => Path.Combine(OutputPath, "AssetDB.json");
         [JsonIgnore] public string ImportedAssetDB => Path.Combine(OutputPath, "ImportedAssetDB.json");
+        [JsonIgnore] public string MapSrcDir       => Path.Combine(OutputPath, "maps");
 
         public void Save(string path)
         {
@@ -53,7 +56,8 @@ namespace Rampancy.LightBridge
                 Game       = Game,
                 Editor     = Editor,
                 HEKPath    = HEKPath,
-                OutputPath = OutputPath
+                OutputPath = OutputPath,
+                ShaderTags = ShaderTags
             };
 
             return newProfile;

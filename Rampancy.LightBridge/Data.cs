@@ -10,9 +10,10 @@ namespace Rampancy.LightBridge
 {
     public static class Data
     {
-        public const string DirName     = "RampancyLightBridge";
-        public const string ProfilesDir = $"{DirName}/Profiles";
-        public const string LogsDir     = $"{DirName}/Logs";
+        public const string DirName      = "RampancyLightBridge";
+        public const string ProfilesDir  = $"{DirName}/Profiles";
+        public const string LogsDir      = $"{DirName}/Logs";
+        public const string CompilersDir = $"{DirName}/Compilers";
 
         public static List<Profile> DefaultProfiles = new List<Profile>()
         {
@@ -21,7 +22,8 @@ namespace Rampancy.LightBridge
                 Name       = "Halo CE (MCC) - Trenchbroom",
                 Game       = Game.HaloCEMCC,
                 Editor     = OutPutEditor.TrenchBroom,
-                ShaderTags = new string[] { "shader_environment", "shader_transparent_chicago", "shader_transparent_generic" }
+                Compiler   = Compiler.EricwQ2,
+                ShaderTags = new string[] { "shader_environment", "shader_transparent_glass" }
             }
         };
 
@@ -51,8 +53,7 @@ namespace Rampancy.LightBridge
                 {
                     Log.Information("Missing default profile ({ProfileName}), creating", defaults.Name);
                     profiles.Add(defaults);
-                    var profilePath = Path.Combine(ProfilesDir, $"{defaults.Name}.json");
-                    defaults.Save(profilePath);
+                    defaults.Save(ProfilesDir);
                 }
             }
 
@@ -69,5 +70,11 @@ namespace Rampancy.LightBridge
     public enum OutPutEditor
     {
         TrenchBroom
+    }
+
+    public enum Compiler
+    {
+        None,
+        EricwQ2
     }
 }
