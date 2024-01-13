@@ -30,6 +30,7 @@ namespace Rampancy.LightBridge
         public static List<Profile> LoadProfiles()
         {
             Directory.CreateDirectory(ProfilesDir);
+            Directory.CreateDirectory(CompilersDir);
 
             var files    = Directory.GetFiles(ProfilesDir, "*.json");
             var profiles = new List<Profile>(files.Length);

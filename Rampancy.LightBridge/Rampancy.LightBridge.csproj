@@ -9,6 +9,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <PublishSingleFile>true</PublishSingleFile>
     <SelfContained>true</SelfContained>
+    <ApplicationIcon>Assets\Icon.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,6 +20,11 @@
     <None Remove="Assets\tooltex\Sky.png" />
     <None Remove="Assets\tooltex\Sound.png" />
     <None Remove="Assets\tooltex\Weather Poly.png" />
+    <None Remove="Assets\Trenchbroom\Halo1\maps\LB\Demo\models\demo.map" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Assets\Icon.ico" />
   </ItemGroup>
 
   <ItemGroup>
@@ -35,6 +41,7 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Assets\LightBridge_BG.png" />
+    <EmbeddedResource Include="Assets\Trenchbroom\Halo1\maps\LB\Demo\models\demo.map" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,0 +1,19 @@
+@SolidClass = worldspawn : "World entity" []
+
+@baseclass size(-16 -16 -35, 16 16 35) color(0 255 0) model({ "path": ":models/cyborg.obj" }) = PlayerClass []
+@baseclass size(-8 -8 -8, 8 8 8) color(0 255 0) = PointClass []
+@baseclass size(-16 -16 -25, 16 16 25) color(0 255 0) = PlayerClassCrouching []
+@baseclass size(-16 -16 -25, 16 16 25) color(0 255 0) = WarthogClass []
+
+@PointClass base(PointClass) = info_inside_marker : "Inside Marker" []
+
+@PointClass base(PlayerClass) = info_player_scale : "Player Scale" []
+@PointClass base(PlayerClassCrouching) = info_player_scale_crouching : "Player Scale Crouching" []
+
+@SolidClass = func_group : "Group of brushes for in-editor use" []
+@SolidClass = func_detail_fence  : "Group of brushes for certain compilers" []
+@SolidClass = func_detail_wall  : "Group of brushes for certain compilers" []
+
+@SolidClass = func_exact_portal  : "" []
+@SolidClass = func_portal  : "" []
+@SolidClass = func_glass  : "" []

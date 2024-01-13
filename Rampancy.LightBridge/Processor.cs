@@ -61,6 +61,7 @@ namespace Rampancy.LightBridge
             var task = Task.Factory.StartNew(() =>
             {
                 WaitTillAllTasksAreFinished();
+                CopyDemoMap();
                 CopyToolTextures();
                 IsSyncing = false;
                 OnSyncingDone?.Invoke();
@@ -221,6 +222,17 @@ namespace Rampancy.LightBridge
 
             Directory.CreateDirectory(Path.GetDirectoryName(path));
             File.WriteAllText(path, shaderTemplate);
+        }
+
+        private void CopyDemoMap()
+        {
+            var basePath = Path.Combine(Profile.OutputPath, "maps");
+
+            if (Profile.Editor == OutPutEditor.TrenchBroom && Profile.Game is Game.HaloCEMCC or Game.HaloCE)
+            {
+                SaveEmbedResourceToDisk("Rampancy.LightBridge.Assets.Trenchbroom.Halo1.maps.LB.Demo.models.demo.map",
+                            Path.Combine(basePath, "LB/Demo/models/demo.map"));
+            }
         }
 
         // Copy some tool textures used in the editors only that might not be with the gmaes
