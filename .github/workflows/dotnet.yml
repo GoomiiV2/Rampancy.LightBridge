@@ -5,7 +5,7 @@ name: .NET
 
 on:
   push:
-    branches: [ "main", "actions-test" ]
+    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
   release:
